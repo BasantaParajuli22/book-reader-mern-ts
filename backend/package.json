@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "nodemon": "nodemon src/index.ts",
     "dev": "ts-node src/index.ts",
     "dev:watch": "ts-node --watch src/index.ts",
     "build": "tsc",
@@ -21,19 +22,24 @@
   "description": "",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.0.7",
+    "@types/nodemailer": "^6.4.17",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
+    "nodemailer": "^7.0.5",
+    "nodemon": "^3.1.10",
     "zod": "^3.25.67"
   }
 }

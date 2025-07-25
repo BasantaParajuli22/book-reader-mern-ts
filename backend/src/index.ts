@@ -1,3 +1,4 @@
+import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import connectToDB from './config/mongooseConfig';
@@ -17,6 +18,9 @@ dns.setServers(['8.8.8.8', '8.8.4.4']); // Google DNS
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(express.json());
+
+// Enable CORS for all origins
+app.use(cors()); // This allows all origins by default
 
 app.use( ('/api'), authRouter);
 app.use( ('/api'), userRouter);

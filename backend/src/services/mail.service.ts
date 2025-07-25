@@ -3,7 +3,7 @@ import transporter from "../config/mail.config";
 //send verification to users email 
 //and token should be generated while being registered 
 export async function sendVerificationMail(toEmail: string, token: string) {
-    const verificationUrl = `${process.env.BACKEND_URL}/verify-email?token=${token}`;
+    const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verify/${token}`;
     const mailOptions = {
         from:`"Book Reader" <${process.env.MAIL_USER}> `,
         to: toEmail,

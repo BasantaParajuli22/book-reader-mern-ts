@@ -5,35 +5,49 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import Image from "next/image"
+import Image from "next/image";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { registerUser } from "@/lib/api";
 
 export default function RegisterPage() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const data = await registerUser({ username: fullName, email, password });
+      if (data.success) {
+        setSuccess("Registration successful! Please check your email for verification.");
+        setFullName("");
+        setEmail("");
+        setPassword("");
+        // Optionally redirect after a short delay
+        // setTimeout(() => router.push("/auth/login"), 3000);
+      } else {
+        setError(data.message || "Registration failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again later.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 p-4">
       <div className="absolute top-4 left-4">
         <Image src="/file.svg" alt="Logo" width={40} height={40} className="animate-pulse" />
       </div>
       
-      <div className="w-full max-w-[1000px] grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        {/* Left side - Decorative */}
-        <div className="hidden md:flex flex-col items-center justify-center space-y-6">
-          <div className="relative w-full h-[400px]">
-            <Image 
-              src="/window.svg" 
-              alt="Illustration" 
-              fill
-              className="object-contain animate-float"
-            />
-          </div>
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Join Our Community
-            </h1>
-            <p className="text-gray-600 max-w-sm">
-              Start your reading journey today. Create an account to unlock a world of literary treasures.
-            </p>
-          </div>
-        </div>
+      <div className="w-full max-w-[500px] flex justify-center items-center">
+
 
         {/* Right side - Register Form */}
         <Card className="w-full shadow-xl border-0 backdrop-blur-sm bg-white/80">
@@ -42,64 +56,62 @@ export default function RegisterPage() {
               Create an Account
             </CardTitle>
             <CardDescription>
-              Choose your preferred method to register
+              Sign up to your account to access all the features
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button 
-              variant="outline" 
-              className="w-full relative overflow-hidden group hover:border-purple-500 transition-colors duration-300"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
-              </svg>
-              Continue with Google
-            </Button>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white/80 px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
+
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-              <Input 
-                id="name" 
-                type="text" 
-                placeholder="John Doe"
-                className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="m@example.com"
-                className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-              <Input 
-                id="password" 
-                type="password"
-                className="border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-300"
-              />
-            </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {success && <p className="text-green-500 text-sm">{success}</p>}
 
-            <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              Create Account
-            </Button>
+              <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+                Create Account
+              </Button>
+            </form>
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">

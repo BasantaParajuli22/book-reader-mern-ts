@@ -1,94 +1,55 @@
+"use client"
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
-const novels = [
-  {
-    id: 1,
-    title: "The Shadow's Edge",
-    author: "Elena Blake",
-    description: "A thrilling fantasy novel about a young mage discovering her powers in a world where magic is forbidden.",
-    coverImage: "/cover.jpg",
-    chapters: 24,
-    likes: 1243,
-    bookmarks: 567,
-    status: "Ongoing",
-    genre: ["Fantasy", "Adventure"],
-    lastUpdated: "2025-07-19",
-  },
-  {
-    id: 2,
-    title: "Quantum Dreams",
-    author: "David Chen",
-    description: "A science fiction masterpiece that explores the boundaries between reality and consciousness in a post-AI world.",
-    coverImage: "/cover.jpg",
-    chapters: 36,
-    likes: 2891,
-    bookmarks: 1432,
-    status: "Completed",
-    genre: ["Sci-Fi", "Mystery"],
-    lastUpdated: "2025-07-15",
-  },
-  {
-    id: 3,
-    title: "Whispers of the Void",
-    author: "Maya Sinclair",
-    description: "A dark cosmic horror tale following an astronaut's descent in to madness after encountering an ancient entity.",
-    coverImage: "/cover.jpg",
-    chapters: 18,
-    likes: 876,
-    bookmarks: 321,
-    status: "Ongoing",
-    genre: ["Horror", "Sci-Fi"],
-    lastUpdated: "2025-07-18",
-  },
-  {
-    id: 4,
-    title: "The Last Kingdom",
-    author: "Liam O’Connor",
-    description: "An epic historical fiction saga about a warrior's quest to reclaim his homeland from a tyrannical ruler.",
-    coverImage: "/cover.jpg",
-    chapters: 42,
-    likes: 1954,
-    bookmarks: 789,
-    status: "Completed",
-    genre: ["Historical", "Adventure"],
-    lastUpdated: "2025-07-10",
-  },
-  {
-    id: 5,
-    title: "Echoes of Eternity",
-    author: "Sofia Alvarez",
-    description: "A romantic fantasy where two souls are bound across lifetimes, fighting to reunite against cosmic odds.",
-    coverImage: "/cover.jpg",
-    chapters: 30,
-    likes: 1623,
-    bookmarks: 654,
-    status: "Ongoing",
-    genre: ["Romance", "Fantasy"],
-    lastUpdated: "2025-07-17",
-  },
-  {
-    id: 6,
-    title: "Neon Requiem",
-    author: "Kaito Tanaka",
-    description: "A cyberpunk thriller about a hacker uncovering a conspiracy in a dystopian megacity ruled by corporations.",
-    coverImage: "/cover.jpg",
-    chapters: 27,
-    likes: 2310,
-    bookmarks: 987,
-    status: "Ongoing",
-    genre: ["Cyberpunk", "Thriller"],
-    lastUpdated: "2025-07-20",
-  },
-];
+interface Novel {
+  _id: string;
+  title: string;
+  author: string;
+  description: string;
+  genre: string[];
+  status: string;
+  coverImage: string;
+  readCount: number;
+  createdAt: string;
+  updatedAt: string;
+  latestChapters: { chapterNumber: number; createdAt: string }[];
+}
 
-export default function Home() {
+// export default function Home() {
+  
+  export default function Home() {
+  const [novels, setNovels] = useState<Novel[]>([]);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    const fetchNovels = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/books"); // Assuming backend runs on port 5000
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setNovels(data.data);
+      } catch (error) {
+        console.error("Failed to fetch novels:", error);
+      }
+    };
+
+    fetchNovels();
+  }, []);
   return (
     <div className="container mx-auto py-8">
       {/* Hero Section */}
       <section className="mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to BookReader</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome{user ? `, ${user.username}` : ""} to BookReader</h1>
         <p className="text-lg text-gray-600 mb-8">
           Discover thousands of novels across multiple genres. Read, bookmark, and enjoy your favorite stories.
         </p>
@@ -97,7 +58,7 @@ export default function Home() {
       {/* Novels Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {novels.map((novel) => (
-          <Card key={novel.id} className="hover:shadow-lg transition-shadow">
+          <Card key={novel._id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="relative w-full h-[200px] mb-4">
                 <Image
@@ -132,7 +93,7 @@ export default function Home() {
                 ))}
               </div>
               <div className="flex justify-between text-sm text-gray-500">
-                <span>{novel.chapters} Chapters</span>
+                <span>{novel.latestChapters.length} Chapters</span>
                 <span>{novel.status}</span>
               </div>
             </CardContent>
@@ -140,10 +101,10 @@ export default function Home() {
             <CardFooter className="justify-between border-t">
               <div className="flex gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
-                  <HeartIcon className="h-4 w-4" /> {novel.likes}
+                  <HeartIcon className="h-4 w-4" /> {novel.readCount}
                 </span>
                 <span className="flex items-center gap-1">
-                  <BookmarkIcon className="h-4 w-4" /> {novel.bookmarks}
+                  <BookmarkIcon className="h-4 w-4" /> 0
                 </span>
               </div>
               <Button>

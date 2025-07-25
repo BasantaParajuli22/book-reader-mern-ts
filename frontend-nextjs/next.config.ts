@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["*"], // Allow images from all hosts
+    domains: ["ocohjxbhun.ufs.sh"], // ✅ Add actual domain here
   },
 };
 

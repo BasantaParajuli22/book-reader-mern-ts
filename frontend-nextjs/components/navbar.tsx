@@ -1,10 +1,25 @@
 "use client"
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse user data from localStorage:", error);
+        localStorage.removeItem("user"); // Clear invalid data
+      }
+    }
+    }, [pathname]);
 
   return (
     <nav className="bg-background border-b sticky top-0 z-50">
@@ -47,12 +62,18 @@ export function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/auth/login">
-              <Button variant="outline">Sign In</Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button>Sign Up</Button>
-            </Link>
+            {user ? (
+              <span className="text-sm font-medium">Welcome, {user.username}!</span>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="outline">Sign In</Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button>Sign Up</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -126,14 +147,20 @@ export function Navbar() {
               Rankings
             </Link>
             <div className="pt-4 border-t grid gap-2 px-4">
-              <Link href="/auth/login">
-                <Button variant="outline" className="w-full justify-center">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/register">
-                <Button className="w-full justify-center">Sign Up</Button>
-              </Link>
+              {user ? (
+                <span className="text-sm font-medium text-center">Welcome, {user.username}!</span>
+              ) : (
+                <>
+                  <Link href="/auth/login">
+                    <Button variant="outline" className="w-full justify-center">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <Button className="w-full justify-center">Sign Up</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
